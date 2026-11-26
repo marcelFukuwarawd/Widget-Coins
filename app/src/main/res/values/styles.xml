@@ -17,4 +17,7 @@
         <item name="android:maxLines">1</item>
         <item name="android:includeFontPadding">false</item>
     </style>
+    <style name="WidgetText.Muted">
+        <item name="android:textColor">#FFB4BCCB</item>
+    </style>
 </resources>

@@ -26,7 +26,8 @@ public final class WidgetConfig {
     /** Opacidade do fundo, 0 (totalmente transparente) a 100. */
     public int bgOpacity = 0;
     public boolean showChange = true;
-    public boolean showFooter = true;
+    public boolean showHeader = true;
+    public String title = "Lista de Interesse";
 
     public static List<Coin> defaultCoins() {
         List<Coin> list = new ArrayList<>();
@@ -55,7 +56,8 @@ public final class WidgetConfig {
             cfg.textSize = o.optInt("textSize", TEXT_AUTO);
             cfg.bgOpacity = o.optInt("bgOpacity", 0);
             cfg.showChange = o.optBoolean("showChange", true);
-            cfg.showFooter = o.optBoolean("showFooter", true);
+            cfg.showHeader = o.optBoolean("showHeader", true);
+            cfg.title = o.optString("title", cfg.title);
             JSONArray arr = o.optJSONArray("coins");
             if (arr != null) {
                 for (int i = 0; i < arr.length(); i++) {
@@ -77,7 +79,8 @@ public final class WidgetConfig {
             o.put("textSize", textSize);
             o.put("bgOpacity", bgOpacity);
             o.put("showChange", showChange);
-            o.put("showFooter", showFooter);
+            o.put("showHeader", showHeader);
+            o.put("title", title);
             JSONArray arr = new JSONArray();
             for (Coin coin : coins) {
                 JSONObject co = new JSONObject();

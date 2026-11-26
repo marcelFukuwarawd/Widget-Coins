@@ -21,20 +21,52 @@ public final class PriceApi {
 
     private PriceApi() {}
 
-    /** Retorna mapa coinId -> {preço, variação 24h em %}. */
-    public static Map<String, double[]> fetchPrices(Collection<String> ids, String currency) throws Exception {
-        Map<String, double[]> out = new HashMap<>();
+    /** Cotação de uma moeda. */
+    public static final class Quote {
+        public double price;
+        public double change24h;
+        public String imageUrl;
+    }
+
+    /** Busca preço, variação 24h e URL do logo de cada moeda. */
+    public static Map<String, Quote> fetchPrices(Collection<String> ids, String currency) throws Exception {
+        Map<String, Quote> out = new HashMap<>();
         if (ids.isEmpty()) return out;
         String joined = String.join(",", ids);
-        String url = BASE + "/simple/price?ids=" + URLEncoder.encode(joined, "UTF-8")
-                + "&vs_currencies=" + currency + "&include_24hr_change=true";
-        JSONObject root = new JSONObject(get(url));
-        for (String id : ids) {
-            JSONObject o = root.optJSONObject(id);
-            if (o == null || !o.has(currency)) continue;
-            out.put(id, new double[]{o.getDouble(currency), o.optDouble(currency + "_24h_change", 0)});
+        String url = BASE + "/coins/markets?vs_currency=" + currency
+                + "&ids=" + URLEncoder.encode(joined, "UTF-8")
+                + "&per_page=250&sparkline=false&price_change_percentage=24h";
+        JSONArray arr = new JSONArray(get(url));
+        for (int i = 0; i < arr.length(); i++) {
+            JSONObject o = arr.getJSONObject(i);
+            if (o.isNull("current_price")) continue;
+            Quote q = new Quote();
+            q.price = o.getDouble("current_price");
+            q.change24h = o.isNull("price_change_percentage_24h") ? 0 : o.optDouble("price_change_percentage_24h", 0);
+            q.imageUrl = o.optString("image", null);
+            out.put(o.getString("id"), q);
         }
         return out;
+    }
+
+    /** Baixa uma imagem (logo da moeda). */
+    public static byte[] download(String url) throws Exception {
+        HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+        conn.setConnectTimeout(7000);
+        conn.setReadTimeout(7000);
+        conn.setRequestProperty("User-Agent", "WidgetCoins/1.0 (Android)");
+        try {
+            if (conn.getResponseCode() != 200) throw new Exception("HTTP " + conn.getResponseCode());
+            try (java.io.InputStream in = conn.getInputStream()) {
+                java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream();
+                byte[] buf = new byte[8192];
+                int n;
+                while ((n = in.read(buf)) > 0) bos.write(buf, 0, n);
+                return bos.toByteArray();
+            }
+        } finally {
+            conn.disconnect();
+        }
     }
 
     /** Pesquisa moedas pelo nome ou símbolo. */

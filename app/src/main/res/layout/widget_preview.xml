@@ -2,11 +2,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#66000000"
-    android:gravity="center_vertical"
+    android:background="#55000000"
     android:orientation="vertical"
-    android:padding="8dp">
-    <TextView style="@style/WidgetText" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="16sp" android:text="BTC   $ 97.000,00" />
-    <TextView style="@style/WidgetText" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="16sp" android:text="ETH   $ 3.500,00" />
-    <TextView style="@style/WidgetText" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="16sp" android:text="SOL   $ 200,00" />
+    android:padding="10dp">
+    <TextView style="@style/WidgetText" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="16sp" android:text="Lista de Interesse" android:paddingBottom="6dp" />
+    <TextView style="@style/WidgetText" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="15sp" android:padding="4dp" android:text="BTC                $97.000,00" />
+    <TextView style="@style/WidgetText" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="15sp" android:padding="4dp" android:text="ETH                  $3.500,00" />
+    <TextView style="@style/WidgetText" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="15sp" android:padding="4dp" android:text="SOL                     $200,00" />
 </LinearLayout>

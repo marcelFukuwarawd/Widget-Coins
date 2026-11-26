@@ -130,6 +130,14 @@ public class ConfigActivity extends Activity {
         searchBtn.setOnClickListener(v -> doSearch.run());
         query.setOnEditorActionListener((v, id, ev) -> { doSearch.run(); return true; });
 
+        // --- Título
+        root.addView(section("Título do widget"));
+        EditText titleField = new EditText(this);
+        titleField.setSingleLine(true);
+        titleField.setText(cfg.title);
+        titleField.setHint("(sem título)");
+        root.addView(titleField);
+
         // --- Cotação
         root.addView(section("Cotação em"));
         Spinner spinner = new Spinner(this);
@@ -181,13 +189,13 @@ public class ConfigActivity extends Activity {
         change.setChecked(cfg.showChange);
         root.addView(change);
         CheckBox footer = new CheckBox(this);
-        footer.setText("Mostrar horário e engrenagem");
-        footer.setChecked(cfg.showFooter);
+        footer.setText("Mostrar cabeçalho (título, horário, atualizar e opções)");
+        footer.setChecked(cfg.showHeader);
         root.addView(footer);
 
         root.addView(hint("Dica: toque e segure o widget na tela inicial para redimensioná-lo arrastando as "
-                + "bordas, ou escolha \"Configurações\" para voltar a esta tela. Toque nos preços para atualizar."
-                + (footer.isChecked() ? "" : " Sem a engrenagem, use o toque e segure para abrir as opções.")));
+                + "bordas, ou escolha \"Configurações\" para voltar a esta tela. Os preços atualizam sozinhos "
+                + "a cada 5 minutos; toque em ⟳ para atualizar na hora."));
 
         // --- Botões
         LinearLayout buttons = new LinearLayout(this);
@@ -207,7 +215,8 @@ public class ConfigActivity extends Activity {
             cfg.textSize = auto.isChecked() ? WidgetConfig.TEXT_AUTO : size.getProgress() + 8;
             cfg.bgOpacity = bg.getProgress();
             cfg.showChange = change.isChecked();
-            cfg.showFooter = footer.isChecked();
+            cfg.showHeader = footer.isChecked();
+            cfg.title = titleField.getText().toString().trim();
             saveAndFinish();
         });
         buttons.addView(cancel);

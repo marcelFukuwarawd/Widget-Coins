@@ -110,14 +110,28 @@ public class CoinWidgetProvider extends AppWidgetProvider {
             try {
                 // Agrupa as moedas por moeda de cotação para fazer poucas requisições.
                 Map<String, Set<String>> byCurrency = new HashMap<>();
+                boolean needFx = false;
                 for (int id : ids) {
                     WidgetConfig cfg = WidgetConfig.load(context, id);
                     Set<String> set = byCurrency.get(cfg.currency);
                     if (set == null) byCurrency.put(cfg.currency, set = new LinkedHashSet<>());
-                    for (Coin c : cfg.coins) set.add(c.id);
+                    for (Coin c : cfg.coins) {
+                        if (c.isFx()) needFx = true;
+                        else set.add(c.id);
+                    }
                 }
                 boolean ok = false;
+                if (needFx) {
+                    try {
+                        double[] fx = PriceApi.fetchUsdBrl();
+                        if (Double.isNaN(fx[1])) WidgetConfig.cacheMissingChange(context, "fx", Coin.FX_BRL_USD, fx[0]);
+                        else WidgetConfig.cachePrice(context, "fx", Coin.FX_BRL_USD, fx[0], fx[1]);
+                        ok = true;
+                    } catch (Exception ignored) {
+                    }
+                }
                 for (Map.Entry<String, Set<String>> e : byCurrency.entrySet()) {
+                    if (e.getValue().isEmpty()) continue;
                     try {
                         Map<String, PriceApi.Quote> prices = PriceApi.fetchPrices(e.getValue(), e.getKey());
                         for (Map.Entry<String, PriceApi.Quote> p : prices.entrySet()) {
@@ -171,12 +185,26 @@ public class CoinWidgetProvider extends AppWidgetProvider {
             Coin coin = coins.get(i);
             RemoteViews row = new RemoteViews(context.getPackageName(), R.layout.widget_row);
             row.setImageViewBitmap(R.id.icon, CoinIcons.get(context, coin));
-            row.setTextViewText(R.id.symbol, coin.symbol);
-            row.setTextViewText(R.id.name, coin.name);
-
-            double[] p = WidgetConfig.cachedPrice(context, cfg.currency, coin.id);
-            row.setTextViewText(R.id.price, p == null ? "--" : cur + formatPrice(p[0]));
-            if (cfg.showChange && p != null) {
+            double[] p;
+            String priceText;
+            if (coin.isFx()) {
+                // Cache guarda R$ por US$ 1 e a variação desse par.
+                p = WidgetConfig.cachedPrice(context, "fx", coin.id);
+                if (p != null && !cfg.fxInverted) {
+                    double pct = p[1];
+                    p = new double[]{1 / p[0], Double.isNaN(pct) ? pct : (1 / (1 + pct / 100) - 1) * 100};
+                }
+                row.setTextViewText(R.id.symbol, cfg.fxInverted ? "USD/BRL" : "BRL/USD");
+                row.setTextViewText(R.id.name, cfg.fxInverted ? "Dólar em real" : "Real em dólar");
+                priceText = p == null ? "--" : (cfg.fxInverted ? "R$ " : "US$ ") + formatFx(p[0]);
+            } else {
+                p = WidgetConfig.cachedPrice(context, cfg.currency, coin.id);
+                row.setTextViewText(R.id.symbol, coin.symbol);
+                row.setTextViewText(R.id.name, coin.name);
+                priceText = p == null ? "--" : cur + formatPrice(p[0]);
+            }
+            row.setTextViewText(R.id.price, priceText);
+            if (cfg.showChange && p != null && !Double.isNaN(p[1])) {
                 double ch = p[1];
                 row.setViewVisibility(R.id.change, View.VISIBLE);
                 row.setTextViewText(R.id.change, String.format(Locale.getDefault(), "%s %.2f%%",
@@ -246,6 +274,10 @@ public class CoinWidgetProvider extends AppWidgetProvider {
             case "btc": return "₿";
             default: return c.toUpperCase() + " ";
         }
+    }
+
+    static String formatFx(double v) {
+        return new DecimalFormat("0.0000", DecimalFormatSymbols.getInstance(Locale.getDefault())).format(v);
     }
 
     static String formatPrice(double v) {

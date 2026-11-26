@@ -35,6 +35,7 @@ import java.util.List;
 public class ConfigActivity extends Activity {
     private static final String[] CURRENCIES = {"usd", "brl", "eur", "gbp", "jpy", "btc"};
     private static final Coin[] POPULAR = {
+            Coin.fxBrlUsd(),
             new Coin("bitcoin", "BTC", "Bitcoin"),
             new Coin("ethereum", "ETH", "Ethereum"),
             new Coin("solana", "SOL", "Solana"),
@@ -150,6 +151,10 @@ public class ConfigActivity extends Activity {
         spinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, labels));
         spinner.setSelection(sel);
         root.addView(spinner);
+        CheckBox fxInv = new CheckBox(this);
+        fxInv.setText("Linha de câmbio: mostrar dólar em real (USD/BRL, R$ por US$ 1) em vez de real em dólar");
+        fxInv.setChecked(cfg.fxInverted);
+        root.addView(fxInv);
 
         // --- Tamanho do texto
         root.addView(section("Tamanho do texto"));
@@ -217,6 +222,7 @@ public class ConfigActivity extends Activity {
             cfg.showChange = change.isChecked();
             cfg.showHeader = footer.isChecked();
             cfg.title = titleField.getText().toString().trim();
+            cfg.fxInverted = fxInv.isChecked();
             saveAndFinish();
         });
         buttons.addView(cancel);

@@ -49,6 +49,7 @@ public final class CoinIcons {
 
     /** Logo salvo ou, se ainda não houver, um círculo colorido com a inicial. */
     public static Bitmap get(Context c, Coin coin) {
+        if (coin.isFx()) return fxIcon();
         File f = file(c, coin.id);
         if (f.exists()) {
             Bitmap b = BitmapFactory.decodeFile(f.getAbsolutePath());
@@ -64,6 +65,30 @@ public final class CoinIcons {
         canvas.drawOval(new RectF(0, 0, SIZE, SIZE), p);
         p.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(src, new Rect(0, 0, src.getWidth(), src.getHeight()), new Rect(0, 0, SIZE, SIZE), p);
+        return out;
+    }
+
+    /** Círculo verde com losango amarelo e "R$", inspirado nas cores do Brasil. */
+    private static Bitmap fxIcon() {
+        Bitmap out = Bitmap.createBitmap(SIZE, SIZE, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(out);
+        Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
+        p.setColor(0xFF009C3B);
+        canvas.drawOval(new RectF(0, 0, SIZE, SIZE), p);
+        android.graphics.Path d = new android.graphics.Path();
+        float m = SIZE / 2f;
+        d.moveTo(m, SIZE * 0.14f);
+        d.lineTo(SIZE * 0.9f, m);
+        d.lineTo(m, SIZE * 0.86f);
+        d.lineTo(SIZE * 0.1f, m);
+        d.close();
+        p.setColor(0xFFFFDF00);
+        canvas.drawPath(d, p);
+        p.setColor(0xFF002776);
+        p.setTypeface(Typeface.DEFAULT_BOLD);
+        p.setTextSize(SIZE * 0.32f);
+        p.setTextAlign(Paint.Align.CENTER);
+        canvas.drawText("R$", m, m - (p.descent() + p.ascent()) / 2f, p);
         return out;
     }
 

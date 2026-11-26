@@ -1,7 +1,7 @@
 # Widget Coins
 
 Widget Android **transparente e sem bordas** que mostra cotações de criptomoedas
-(padrão: **BTC, ETH e SOL em USD**) no estilo "lista de interesse": logo da moeda, símbolo e nome
+(padrão: **BTC, ETH e SOL em USD**, mais uma linha com o câmbio **BRL/USD**) no estilo "lista de interesse": logo da moeda, símbolo e nome
 à esquerda; preço em destaque e variação de 24h (▲ verde / ▼ vermelho) à direita.
 
 ## Instalar
@@ -23,7 +23,10 @@ Nas opções você pode:
 - **Adicionar moedas** (atalhos para as populares ou busca por qualquer moeda da CoinGecko), remover e reordenar;
 - Escolher **tamanho do texto** (automático, que acompanha o redimensionamento, ou fixo de 8 a 40 sp);
 - Ajustar a **opacidade do fundo** (0% = totalmente transparente);
-- Trocar a cotação (USD, BRL, EUR, GBP, JPY, BTC);
+- Trocar a cotação das criptos (USD, BRL, EUR, GBP, JPY, BTC);
+- Câmbio real × dólar: por padrão **BRL/USD** (quantos dólares vale R$ 1); uma opção inverte
+  para **USD/BRL** (quantos reais vale US$ 1). A linha pode ser removida/re-adicionada como qualquer moeda.
+  Fonte: [AwesomeAPI](https://docs.awesomeapi.com.br/) (reserva: taxas da CoinGecko).
 - Mudar o título do widget;
 - Mostrar/ocultar variação 24h e o cabeçalho.
 

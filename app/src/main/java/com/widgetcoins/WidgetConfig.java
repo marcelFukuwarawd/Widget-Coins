@@ -28,12 +28,16 @@ public final class WidgetConfig {
     public boolean showChange = true;
     public boolean showHeader = true;
     public String title = "Lista de Interesse";
+    /** false: BRL/USD (US$ por R$ 1). true: USD/BRL (R$ por US$ 1). */
+    public boolean fxInverted = false;
+    private static final int VERSION = 2;
 
     public static List<Coin> defaultCoins() {
         List<Coin> list = new ArrayList<>();
         list.add(new Coin("bitcoin", "BTC", "Bitcoin"));
         list.add(new Coin("ethereum", "ETH", "Ethereum"));
         list.add(new Coin("solana", "SOL", "Solana"));
+        list.add(Coin.fxBrlUsd());
         return list;
     }
 
@@ -58,6 +62,7 @@ public final class WidgetConfig {
             cfg.showChange = o.optBoolean("showChange", true);
             cfg.showHeader = o.optBoolean("showHeader", true);
             cfg.title = o.optString("title", cfg.title);
+            cfg.fxInverted = o.optBoolean("fxInverted", false);
             JSONArray arr = o.optJSONArray("coins");
             if (arr != null) {
                 for (int i = 0; i < arr.length(); i++) {
@@ -65,6 +70,12 @@ public final class WidgetConfig {
                     cfg.coins.add(new Coin(co.getString("id"), co.getString("symbol"),
                             co.optString("name", co.getString("symbol"))));
                 }
+            }
+            // Configurações antigas (v1) ganham a linha de câmbio uma única vez.
+            if (o.optInt("version", 1) < 2) {
+                boolean has = false;
+                for (Coin k : cfg.coins) has |= k.isFx();
+                if (!has) cfg.coins.add(Coin.fxBrlUsd());
             }
         } catch (Exception e) {
             cfg.coins = defaultCoins();
@@ -81,6 +92,8 @@ public final class WidgetConfig {
             o.put("showChange", showChange);
             o.put("showHeader", showHeader);
             o.put("title", title);
+            o.put("fxInverted", fxInverted);
+            o.put("version", VERSION);
             JSONArray arr = new JSONArray();
             for (Coin coin : coins) {
                 JSONObject co = new JSONObject();
@@ -105,6 +118,10 @@ public final class WidgetConfig {
         prefs(c).edit()
                 .putString("price_" + currency + "_" + coinId, price + ";" + change)
                 .apply();
+    }
+
+    public static void cacheMissingChange(Context c, String currency, String coinId, double price) {
+        prefs(c).edit().putString("price_" + currency + "_" + coinId, price + ";NaN").apply();
     }
 
     /** Retorna {preço, variação24h} ou null se nunca foi buscado. */

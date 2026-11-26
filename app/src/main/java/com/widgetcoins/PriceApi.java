@@ -69,6 +69,25 @@ public final class PriceApi {
         }
     }
 
+    /**
+     * Cotação do dólar em reais: {R$ por US$ 1, variação do dia em % (NaN se desconhecida)}.
+     * Fonte principal: AwesomeAPI; reserva: taxas de câmbio da CoinGecko.
+     */
+    public static double[] fetchUsdBrl() throws Exception {
+        try {
+            JSONObject o = new JSONObject(get("https://economia.awesomeapi.com.br/json/last/USD-BRL"))
+                    .getJSONObject("USDBRL");
+            double bid = Double.parseDouble(o.getString("bid"));
+            double pct = Double.parseDouble(o.optString("pctChange", "NaN"));
+            if (bid > 0) return new double[]{bid, pct};
+        } catch (Exception ignored) {
+        }
+        JSONObject rates = new JSONObject(get(BASE + "/exchange_rates")).getJSONObject("rates");
+        double usd = rates.getJSONObject("usd").getDouble("value");
+        double brl = rates.getJSONObject("brl").getDouble("value");
+        return new double[]{brl / usd, Double.NaN};
+    }
+
     /** Pesquisa moedas pelo nome ou símbolo. */
     public static List<Coin> search(String query) throws Exception {
         String url = BASE + "/search?query=" + URLEncoder.encode(query, "UTF-8");

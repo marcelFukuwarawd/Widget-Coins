@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AppTheme" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:colorAccent">#F7931A</item>
+    </style>
+    <style name="ConfigTheme" parent="@android:style/Theme.Material.Dialog.NoActionBar">
+        <item name="android:colorAccent">#F7931A</item>
+        <item name="android:windowMinWidthMajor">95%</item>
+        <item name="android:windowMinWidthMinor">95%</item>
+    </style>
+    <style name="WidgetText">
+        <item name="android:textColor">#FFFFFFFF</item>
+        <item name="android:shadowColor">#CC000000</item>
+        <item name="android:shadowDx">1</item>
+        <item name="android:shadowDy">1</item>
+        <item name="android:shadowRadius">3</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+</resources>

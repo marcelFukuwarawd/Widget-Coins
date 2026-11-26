@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Widget Coins</string>
+    <string name="widget_name">Cotações Cripto</string>
+    <string name="widget_description">Preços de BTC, ETH, SOL e outras moedas, com fundo transparente</string>
+</resources>
